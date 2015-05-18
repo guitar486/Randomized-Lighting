@@ -35,10 +35,6 @@
 				<List class="indigo.devices" filter="indigo.relay"/>
 			</Field>
 
-
-
-
-
     </ConfigUI>
     <CallbackMethod>stop_random_lighting</CallbackMethod>
   </Action>
