@@ -7,6 +7,39 @@
 
   <Action id='stop_random_lighting'>
     <Name>Stop Random Lighting</Name>
+    <ConfigUI>
+
+      <Field type="menu" id="stop_action" defaultValue="stop_and_keep_specific_on">
+      	<Label>Action:</Label>
+
+      	<List>
+      		<Option value="stop_and_turn_off">Stop And Turn Off Lights</Option>
+      		<Option value="stop_and_keep_on">Stop And Keep Current Lights On</Option>
+          <Option value="stop_and_keep_specific_on">Stop And Keep Specific Lights On</Option>
+      	</List>
+      </Field>
+
+      <Field id='text1' type='label' visibleBindingId="stop_action" visibleBindingValue='stop_and_keep_specific_on'>
+				<Label>Select all of the lights to keep/turn on:</Label>
+			</Field>
+
+			<Field id="indigo_dimmable" type="list" visibleBindingId="stop_action" visibleBindingValue='stop_and_keep_specific_on'>
+				<Label>Dimmable:</Label>
+				<List class="indigo.devices" filter="indigo.dimmer"/>
+			</Field>
+
+      <Field id='sep1' type='separator'/>
+
+      <Field id="indigo_relay" type="list" visibleBindingId="stop_action" visibleBindingValue='stop_and_keep_specific_on'>
+				<Label>On/Off:</Label>
+				<List class="indigo.devices" filter="indigo.relay"/>
+			</Field>
+
+
+
+
+
+    </ConfigUI>
     <CallbackMethod>stop_random_lighting</CallbackMethod>
   </Action>
 

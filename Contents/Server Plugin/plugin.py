@@ -184,7 +184,37 @@ class Plugin(indigo.PluginBase):
     # Stop Random Lighting
     #==============================================================================================#
     def stop_random_lighting(self, pluginAction):
-        pass
+
+        # Clear queue
+        with self.q.mutex:
+            self.q.queue.clear()
+
+        # Close all active threads
+        for k, v in self.threads.iteritems():
+            v.cancel()
+            indigo.server.log(str(k) + ' cancelled.')
+
+        # Turn lights off if that is the pluginAction
+        if pluginAction.props.get('stop_action', '') == 'stop_and_turn_off':
+            for k, v in self.lights.iteritems():
+                indigo.device.turnOff(k)
+
+        # Keep/turn on specific lights, turn off all others
+        elif pluginAction.props.get('stop_action', '') == 'stop_and_keep_specific_on':
+
+            keepOn = []
+
+            for d in pluginAction.props.get('indigo_dimmable', ''):
+                indigo.device.turnOn(int(d))
+                keepOn.append(int(d))
+
+            for r in pluginAction.props.get('indigo_relay', ''):
+                indigo.device.turnOn(int(r))
+                keepOn.append(int(r))
+
+            for k, v in self.lights.iteritems():
+                if k not in keepOn:
+                    indigo.device.turnOff(k)
 
 #==============================================================================================#
 # Light Class
