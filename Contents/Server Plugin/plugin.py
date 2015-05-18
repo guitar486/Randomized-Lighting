@@ -5,6 +5,7 @@
 import indigo
 import threading
 import random
+import Queue
 
 ####################################################################################################
 # Plugin
@@ -15,6 +16,7 @@ class Plugin(indigo.PluginBase):
 
         self.lights = {}
         self.threads = {}
+        self.q = Queue.Queue()
 
     def __del__(self):
         indigo.PluginBase.__del__(self)
@@ -71,6 +73,9 @@ class Plugin(indigo.PluginBase):
             startDelayMin = 15
             startDelayMax = 70
 
+        #==============================================================================================#
+        # If "Use All Lights" checkbox is un-checked, use only 75% of the lights selected for each run
+        #==============================================================================================#
         if self.p_device.pluginProps.get('use_all_lights', '') == False:
             for i in random.sample(self.lights.keys(), int(round(len(self.lights.keys()) * .75))):
                 light = self.lights[i]
@@ -81,6 +86,9 @@ class Plugin(indigo.PluginBase):
                 self.threads['start ' + light.name] = threading.Timer(startDelay, self.turn_on_light, (light,))
                 self.threads['start ' + light.name].start()
 
+        #==============================================================================================#
+        # If "Use All Lights" checkbox is checked, use all lights
+        #==============================================================================================#
         else:
             for i in self.lights.keys():
                 light = self.lights[i]
@@ -139,6 +147,7 @@ class Plugin(indigo.PluginBase):
             #==============================================================================================#
             self.threads[light.name] = threading.Timer(duration, self.turn_off_light, (light,))
             self.threads[light.name].start()
+            self.q.put(light.indigo_id)
 
         else:
             #==============================================================================================#
@@ -151,6 +160,7 @@ class Plugin(indigo.PluginBase):
             #==============================================================================================#
             self.threads[light.name] = threading.Timer(duration, self.turn_off_light, (light,))
             self.threads[light.name].start()
+            self.q.put(light.indigo_id)
 
     #==============================================================================================#
     # Turn Off Light
@@ -160,8 +170,21 @@ class Plugin(indigo.PluginBase):
         # Close thread that delayed turning light off
         self.threads[light.name].cancel()
 
-        # Turn off light
-        indigo.device.turnOff(light.indigo_id)
+        if self.q.qsize() > 1:
+            self.q.get()
+
+            # Turn off light
+            indigo.device.turnOff(light.indigo_id)
+
+        elif self.q.qsize() == 1:
+            self.q.get()
+            self.start_random_lighting(None)
+
+    #==============================================================================================#
+    # Stop Random Lighting
+    #==============================================================================================#
+    def stop_random_lighting(self, pluginAction):
+        pass
 
 #==============================================================================================#
 # Light Class

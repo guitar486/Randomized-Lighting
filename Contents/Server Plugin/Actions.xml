@@ -5,4 +5,9 @@
     <CallbackMethod>start_random_lighting</CallbackMethod>
   </Action>
 
+  <Action id='stop_random_lighting'>
+    <Name>Stop Random Lighting</Name>
+    <CallbackMethod>stop_random_lighting</CallbackMethod>
+  </Action>
+
 </Actions>
