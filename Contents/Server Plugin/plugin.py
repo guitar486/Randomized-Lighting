@@ -5,6 +5,7 @@
 import indigo
 import threading
 import random
+from datetime import datetime, time
 import Queue
 
 ####################################################################################################
@@ -57,6 +58,36 @@ class Plugin(indigo.PluginBase):
     ####################################################################################################
     def toggle_debugging(self):
         pass
+
+    def runConcurrentThread(self):
+        try:
+            while True:
+
+                daylight = indigo.variables['isDaylight'].value
+
+                if daylight == 'false':
+                    quiet_set = self.p_device.pluginProps.get('quiet_checkbox', '')
+                    if quiet_set == True:
+                        indigo.server.log('Quiet period is set')
+                        quiet_start = int(self.p_device.pluginProps.get('quiet_start', ''))
+                        quiet_end = int(self.p_device.pluginProps.get('quiet_end', ''))
+
+
+                        now = datetime.now()
+                        nowTime = now.time()
+
+                        if nowTime.hour <= quiet_start and nowTime.hour >= quiet_end:
+                            indigo.server.log('yeehaw')
+
+
+
+                    # self.enabled = True
+
+                self.sleep(60)
+
+        except self.StopThread:
+            # do any cleanup here
+            pass
 
     #==============================================================================================#
     # Start Random Lighting

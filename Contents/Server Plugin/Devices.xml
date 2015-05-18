@@ -62,7 +62,39 @@
         <Label>Brightness Maximum (default=85):</Label>
       </Field>
 
+      <!-- Set Quiet Period -->
       <Field id='sep4' type='separator'/>
+
+      <Field id="quiet_checkbox" type="checkbox" defaultValue="false">
+      	<Label>Enable Quiet Period:</Label>
+      </Field>
+
+      <Field id="quiet_start" type="menu" visibleBindingId="quiet_checkbox" visibleBindingValue='true' defaultValue="17">
+        <Label>Disable Random Lighting Starting At:</Label>
+        <List>
+      		<Option value="17">5:00 PM</Option>
+          <Option value="18">6:00 PM</Option>
+          <Option value="19">7:00 PM</Option>
+          <Option value="20">8:00 PM</Option>
+          <Option value="21">9:00 PM</Option>
+          <Option value="22">10:00 PM</Option>
+          <Option value="23">11:00 PM</Option>
+          <Option value="24">12:00 AM</Option>
+          <Option value="25">1:00 AM</Option>
+          <Option value="26">2:00 aM</Option>
+      	</List>
+      </Field>
+
+      <Field id="quiet_end" type="menu" visibleBindingId="quiet_checkbox" visibleBindingValue='true' defaultValue="5">
+        <Label>Re-Enable Random Lighting Starting At:</Label>
+        <List>
+      		<Option value="5">5:00 AM</Option>
+          <Option value="6">6:00 AM</Option>
+      	</List>
+      </Field>
+
+      <!-- Use All Lights -->
+      <Field id='sep6' type='separator'/>
 
       <Field id='use_all_lights' type="checkbox"  defaultValue="false">
       	<Label>Use All Lights:</Label>
