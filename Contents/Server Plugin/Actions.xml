@@ -1,0 +1,8 @@
+<Actions>
+
+  <Action id='start_random_lighting'>
+    <Name>Start Random Lighting</Name>
+    <CallbackMethod>start_random_lighting</CallbackMethod>
+  </Action>
+
+</Actions>

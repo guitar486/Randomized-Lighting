@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<MenuItems>
+
+  <!-- <MenuItem id='configure'>
+    <Name>Configure</Name>
+    <ConfigUI>
+
+			<Field id='text1' type='label'>
+				<Label>Select all of the lights to use in your random lighting scheme:</Label>
+			</Field>
+
+			<Field id="indigo_dimmable" type="list">
+				<Label>Dimmable:</Label>
+				<List class="indigo.devices" filter="indigo.dimmer"/>
+			</Field>
+
+      <Field id='sep1' type='separator'/>
+
+      <Field id="indigo_relay" type="list">
+				<Label>On/Off:</Label>
+				<List class="indigo.devices" filter="indigo.relay"/>
+			</Field>
+
+      <Field id='sep2' type='separator'/>
+
+      <Field id='use_all_lights' type="checkbox"  defaultValue="false">
+      	<Label>Use All Lights:</Label>
+      	<Description></Description>
+      </Field>
+
+      <Field id="text2" type="label">
+      	<Label>Check this if you want to always include every light you've selected in your random lighting schedule.  If left unchecked (default) the plugin will randomly sample from lights you've selected, using most but not all of them for the schedule
+      	</Label>
+      </Field>
+
+		</ConfigUI>
+    <CallbackMethod>configure</CallbackMethod>
+  </MenuItem> -->
+
+  <MenuItem id='toggle_debugging'>
+    <Name>Toggle Debugging</Name>
+    <CallbackMethod>toggle_debugging</CallbackMethod>
+  </MenuItem>
+
+</MenuItems>

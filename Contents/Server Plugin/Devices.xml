@@ -1,0 +1,80 @@
+<Devices>
+
+  <Device type='custom' id='lighting_group'>
+    <Name>Random Lighting Group</Name>
+    <ConfigUI>
+
+			<Field id='text1' type='label'>
+				<Label>Select all of the lights to use in your random lighting scheme:</Label>
+			</Field>
+
+			<Field id="indigo_dimmable" type="list">
+				<Label>Dimmable:</Label>
+				<List class="indigo.devices" filter="indigo.dimmer"/>
+			</Field>
+
+      <Field id='sep1' type='separator'/>
+
+      <Field id="indigo_relay" type="list">
+				<Label>On/Off:</Label>
+				<List class="indigo.devices" filter="indigo.relay"/>
+			</Field>
+
+      <Field id='sep2' type='separator'/>
+
+      <Field id="start_checkbox" type="checkbox" defaultValue="false">
+      	<Label>Custom Start Delay Min/Max (seconds):</Label>
+      </Field>
+
+      <Field id="start_delay_min" type="textfield" visibleBindingId="start_checkbox" visibleBindingValue='true' defaultValue="15">
+        <Label>Duration Minimum (default=15):</Label>
+      </Field>
+
+      <Field id="start_delay_max" type="textfield" visibleBindingId="start_checkbox" visibleBindingValue='true' defaultValue="70">
+        <Label>Duration Maximum (default=70):</Label>
+      </Field>
+
+      <Field id='sep5' type='separator'/>
+
+      <Field id="dur_checkbox" type="checkbox" defaultValue="false">
+      	<Label>Custom Duration Min/Max (seconds):</Label>
+      </Field>
+
+      <Field id="duration_min" type="textfield" visibleBindingId="dur_checkbox" visibleBindingValue='true' defaultValue="600">
+        <Label>Duration Minimum (default=600):</Label>
+      </Field>
+
+      <Field id="duration_max" type="textfield" visibleBindingId="dur_checkbox" visibleBindingValue='true' defaultValue="900">
+        <Label>Duration Maximum (default=900):</Label>
+      </Field>
+
+      <Field id='sep3' type='separator'/>
+
+      <Field id="bri_checkbox" type="checkbox" defaultValue="false">
+      	<Label>Custom Brightness Min/Max (percentage):</Label>
+      </Field>
+
+      <Field id="brightness_min" type="textfield" visibleBindingId="bri_checkbox" visibleBindingValue='true' defaultValue="50">
+        <Label>Brightness Minimum (default=50):</Label>
+      </Field>
+
+      <Field id="brightness_max" type="textfield" visibleBindingId="bri_checkbox" visibleBindingValue='true' defaultValue="85">
+        <Label>Brightness Maximum (default=85):</Label>
+      </Field>
+
+      <Field id='sep4' type='separator'/>
+
+      <Field id='use_all_lights' type="checkbox"  defaultValue="false">
+      	<Label>Use All Lights:</Label>
+      	<Description></Description>
+      </Field>
+
+      <Field id="text2" type="label">
+      	<Label>Check this if you want to always include every light you've selected in your random lighting schedule.  If left unchecked (default) the plugin will randomly sample from lights you've selected, using 75% of them for the schedule.
+      	</Label>
+      </Field>
+
+		</ConfigUI>
+  </Device>
+
+</Devices>
