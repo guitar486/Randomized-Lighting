@@ -79,9 +79,9 @@
           <Option value="21">9:00 PM</Option>
           <Option value="22">10:00 PM</Option>
           <Option value="23">11:00 PM</Option>
-          <Option value="24">12:00 AM</Option>
-          <Option value="25">1:00 AM</Option>
-          <Option value="26">2:00 aM</Option>
+          <Option value="0">12:00 AM</Option>
+          <Option value="1">1:00 AM</Option>
+          <Option value="2">2:00 AM</Option>
       	</List>
       </Field>
 
@@ -90,6 +90,8 @@
         <List>
       		<Option value="5">5:00 AM</Option>
           <Option value="6">6:00 AM</Option>
+          <Option value="7">7:00 AM</Option>
+          <Option value="8">8:00 AM</Option>
       	</List>
       </Field>
 

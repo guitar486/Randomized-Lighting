@@ -15,73 +15,79 @@ class Plugin(indigo.PluginBase):
     def __init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs):
         indigo.PluginBase.__init__(self, pluginId, pluginDisplayName, pluginVersion, pluginPrefs)
 
-        self.lights = {}
         self.threads = {}
         self.q = Queue.Queue()
 
     def __del__(self):
+        for k, v in self.threads.iteritems():
+            v.cancel()
         indigo.PluginBase.__del__(self)
 
-    def startup(self):
-        indigo.server.log('Randomized Lighting plugin started.')
-
+    #==============================================================================================#
+    # Close threads on shutdown
+    #==============================================================================================#
     def shutdown(self):
         for k, v in self.threads.iteritems():
             v.cancel()
-            indigo.server.log(str(k) + ' cancelled.')
 
     ####################################################################################################
 	# Actions here execute every time communication is enabled to a device
 	####################################################################################################
     def deviceStartComm(self, device):
 
+        self.lights = {}
         self.p_device = device
 
         for d in device.pluginProps.get('indigo_dimmable', ''):
-            # indigo.server.log(indigo.devices[int(d)].name + ' - ' + str(d))
             dimmer = indigo.devices[int(d)]
             self.lights[int(d)] = Light(int(d), dimmer.name, True)
 
         for r in device.pluginProps.get('indigo_relay', ''):
-            # indigo.server.log(indigo.devices[int(r)].name + ' - ' + str(r))
             relay = indigo.devices[int(r)]
             self.lights[int(r)] = Light(int(r), relay.name, False)
 
     ####################################################################################################
-    # Remove device from our device_dict if it is deleted in Indigo
+    # Close threads if device is deleted
     ####################################################################################################
     def deviceDeleted(self, device):
-        pass
-
-    ####################################################################################################
-    # Toggle Debugging
-    ####################################################################################################
-    def toggle_debugging(self):
-        pass
+        for k, v in self.threads.iteritems():
+            v.cancel()
 
     def runConcurrentThread(self):
         try:
             while True:
 
+                #============================================================================================#
+                # Check if random lights should be running at startup
+                #============================================================================================#
+                quiet_set = self.p_device.pluginProps.get('quiet_checkbox', '')
                 daylight = indigo.variables['isDaylight'].value
 
-                if daylight == 'false':
-                    quiet_set = self.p_device.pluginProps.get('quiet_checkbox', '')
-                    if quiet_set == True:
-                        indigo.server.log('Quiet period is set')
-                        quiet_start = int(self.p_device.pluginProps.get('quiet_start', ''))
-                        quiet_end = int(self.p_device.pluginProps.get('quiet_end', ''))
+                #============================================================================================#
+                # If Quiet Period is set, check if we are within those bounds and enable/disable
+                #============================================================================================#
+                if quiet_set:
+                    quiet_start = int(self.p_device.pluginProps.get('quiet_start', ''))
+                    quiet_end = int(self.p_device.pluginProps.get('quiet_end', ''))
+                    quiet_range = [17, 18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8]
+                    quiet_period = quiet_range[quiet_range.index(quiet_start):quiet_range.index(quiet_end)]
+                    hour = int(datetime.now().time().hour)
 
+                    if hour in quiet_period:
+                        self.enabled = False
 
-                        now = datetime.now()
-                        nowTime = now.time()
+                    else:
+                        self.enabled = True
 
-                        if nowTime.hour <= quiet_start and nowTime.hour >= quiet_end:
-                            indigo.server.log('yeehaw')
+                #============================================================================================#
+                # Else if no Quiet Period is set, check if it is dark and enable/disable
+                #============================================================================================#
+                else:
+                    if daylight == 'false':
+                        self.enabled = True
 
-
-
-                    # self.enabled = True
+                    elif daylight == 'true':
+                        self.enabled = False
 
                 self.sleep(60)
 
@@ -95,40 +101,44 @@ class Plugin(indigo.PluginBase):
     def start_random_lighting(self, pluginAction):
 
         #==============================================================================================#
-        # Check if user specified custom start delay min/max, else use default
+        # Make sure it is dark and we are not within a user-defined quiet period
         #==============================================================================================#
-        if self.p_device.pluginProps.get('start_checkbox', '') == True:
-            startDelayMin = int(self.p_device.pluginProps.get('start_delay_min', ''))
-            startDelayMax = int(self.p_device.pluginProps.get('start_delay_max', ''))
-        else:
-            startDelayMin = 15
-            startDelayMax = 70
+        if self.enabled == True:
+            #==============================================================================================#
+            # Check if user specified custom start delay min/max, else use default
+            #==============================================================================================#
+            if self.p_device.pluginProps.get('start_checkbox', '') == True:
+                startDelayMin = int(self.p_device.pluginProps.get('start_delay_min', ''))
+                startDelayMax = int(self.p_device.pluginProps.get('start_delay_max', ''))
+            else:
+                startDelayMin = 15
+                startDelayMax = 70
 
-        #==============================================================================================#
-        # If "Use All Lights" checkbox is un-checked, use only 75% of the lights selected for each run
-        #==============================================================================================#
-        if self.p_device.pluginProps.get('use_all_lights', '') == False:
-            for i in random.sample(self.lights.keys(), int(round(len(self.lights.keys()) * .75))):
-                light = self.lights[i]
-                startDelay = random.randint(startDelayMin,startDelayMax)
-                #============================================================================================#
-                # Turn on light after "random" thread timer
-                #============================================================================================#
-                self.threads['start ' + light.name] = threading.Timer(startDelay, self.turn_on_light, (light,))
-                self.threads['start ' + light.name].start()
+            #==============================================================================================#
+            # If "Use All Lights" checkbox is un-checked, use only 75% of the lights selected for each run
+            #==============================================================================================#
+            if self.p_device.pluginProps.get('use_all_lights', '') == False:
+                for i in random.sample(self.lights.keys(), int(round(len(self.lights.keys()) * .75))):
+                    light = self.lights[i]
+                    startDelay = random.randint(startDelayMin,startDelayMax)
+                    #========================================================================================#
+                    # Turn on light after "random" thread timer
+                    #========================================================================================#
+                    self.threads['start ' + light.name] = threading.Timer(startDelay, self.turn_on_light, (light,))
+                    self.threads['start ' + light.name].start()
 
-        #==============================================================================================#
-        # If "Use All Lights" checkbox is checked, use all lights
-        #==============================================================================================#
-        else:
-            for i in self.lights.keys():
-                light = self.lights[i]
-                startDelay = random.randint(startDelayMin,startDelayMax)
-                #============================================================================================#
-                # Turn on light after "random" thread timer
-                #============================================================================================#
-                self.threads['start ' + light.name] = threading.Timer(startDelay, self.turn_on_light, (light,))
-                self.threads['start ' + light.name].start()
+            #==============================================================================================#
+            # If "Use All Lights" checkbox is checked, use all lights
+            #==============================================================================================#
+            else:
+                for i in self.lights.keys():
+                    light = self.lights[i]
+                    startDelay = random.randint(startDelayMin,startDelayMax)
+                    #========================================================================================#
+                    # Turn on light after "random" thread timer
+                    #========================================================================================#
+                    self.threads['start ' + light.name] = threading.Timer(startDelay, self.turn_on_light, (light,))
+                    self.threads['start ' + light.name].start()
 
     #==============================================================================================#
     # Turn On Light
@@ -147,9 +157,6 @@ class Plugin(indigo.PluginBase):
         else:
             durMin = 600
             durMax = 900
-
-        briMin = int(self.p_device.pluginProps.get('brightness_min', ''))
-        briMax = int(self.p_device.pluginProps.get('brightness_max', ''))
 
         #==============================================================================================#
         # Check if user specified custom brightness min/max, else use default
@@ -207,6 +214,9 @@ class Plugin(indigo.PluginBase):
             # Turn off light
             indigo.device.turnOff(light.indigo_id)
 
+        #==============================================================================================#
+        # Queue ensures that 1 light always stays on each cycle
+        #==============================================================================================#
         elif self.q.qsize() == 1:
             self.q.get()
             self.start_random_lighting(None)
@@ -223,7 +233,6 @@ class Plugin(indigo.PluginBase):
         # Close all active threads
         for k, v in self.threads.iteritems():
             v.cancel()
-            indigo.server.log(str(k) + ' cancelled.')
 
         # Turn lights off if that is the pluginAction
         if pluginAction.props.get('stop_action', '') == 'stop_and_turn_off':
