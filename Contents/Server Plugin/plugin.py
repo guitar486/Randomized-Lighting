@@ -63,31 +63,31 @@ class Plugin(indigo.PluginBase):
                 quiet_set = self.p_device.pluginProps.get('quiet_checkbox', '')
                 daylight = indigo.variables['isDaylight'].value
 
-                #============================================================================================#
-                # If Quiet Period is set, check if we are within those bounds and enable/disable
-                #============================================================================================#
-                if quiet_set:
-                    quiet_start = int(self.p_device.pluginProps.get('quiet_start', ''))
-                    quiet_end = int(self.p_device.pluginProps.get('quiet_end', ''))
-                    quiet_range = [17, 18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8]
-                    quiet_period = quiet_range[quiet_range.index(quiet_start):quiet_range.index(quiet_end)]
-                    hour = int(datetime.now().time().hour)
-
-                    if hour in quiet_period:
-                        self.enabled = False
-
-                    else:
-                        self.enabled = True
 
                 #============================================================================================#
-                # Else if no Quiet Period is set, check if it is dark and enable/disable
+                # Check for daylight
                 #============================================================================================#
-                else:
-                    if daylight == 'false':
-                        self.enabled = True
+                if daylight == 'true':
+                    self.enabled = False
 
-                    elif daylight == 'true':
-                        self.enabled = False
+                elif daylight == 'false':
+                    self.enabled = True
+
+                    #========================================================================================#
+                    # If Quiet Period is set, check if we are within those bounds and enable/disable
+                    #========================================================================================#
+                    if quiet_set:
+                        quiet_start = int(self.p_device.pluginProps.get('quiet_start', ''))
+                        quiet_end = int(self.p_device.pluginProps.get('quiet_end', ''))
+                        quiet_range = [17, 18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8]
+                        quiet_period = quiet_range[quiet_range.index(quiet_start):quiet_range.index(quiet_end)]
+                        hour = int(datetime.now().time().hour)
+
+                        if hour in quiet_period:
+                            self.enabled = False
+
+                        else:
+                            self.enabled = True
 
                 self.sleep(60)
 
