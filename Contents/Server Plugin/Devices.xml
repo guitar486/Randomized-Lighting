@@ -26,18 +26,26 @@
       	<Label>Custom Start Delay Min/Max (seconds):</Label>
       </Field>
 
+      <Field id="start_delay_label" type="label" visibleBindingId="start_checkbox" visibleBindingValue='true'>
+        <Label>Set the range for the randomizer.  This is the delay time before a light gets turned on in a sequence.  This will be randomized for every light, every cycle.</Label>
+      </Field>
+
       <Field id="start_delay_min" type="textfield" visibleBindingId="start_checkbox" visibleBindingValue='true' defaultValue="15">
-        <Label>Duration Minimum (default=15):</Label>
+        <Label>Delay Minimum (default=15):</Label>
       </Field>
 
       <Field id="start_delay_max" type="textfield" visibleBindingId="start_checkbox" visibleBindingValue='true' defaultValue="70">
-        <Label>Duration Maximum (default=70):</Label>
+        <Label>Delay Maximum (default=70):</Label>
       </Field>
 
       <Field id='sep5' type='separator'/>
 
       <Field id="dur_checkbox" type="checkbox" defaultValue="false">
       	<Label>Custom Duration Min/Max (seconds):</Label>
+      </Field>
+
+      <Field id="duration_label" type="label" visibleBindingId="dur_checkbox" visibleBindingValue='true'>
+        <Label>Set the range for the randomizer.  This is for the duration that a light will stay on.  This will be randomized for every light, every cycle.</Label>
       </Field>
 
       <Field id="duration_min" type="textfield" visibleBindingId="dur_checkbox" visibleBindingValue='true' defaultValue="600">
@@ -52,6 +60,10 @@
 
       <Field id="bri_checkbox" type="checkbox" defaultValue="false">
       	<Label>Custom Brightness Min/Max (percentage):</Label>
+      </Field>
+
+      <Field id="brightness_label" type="label" visibleBindingId="bri_checkbox" visibleBindingValue='true'>
+        <Label>Set the range for the randomizer.  This is for the brightness of a light.  This will be randomized for every light, every cycle.</Label>
       </Field>
 
       <Field id="brightness_min" type="textfield" visibleBindingId="bri_checkbox" visibleBindingValue='true' defaultValue="50">
