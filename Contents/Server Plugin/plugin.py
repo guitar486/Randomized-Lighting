@@ -239,22 +239,25 @@ class Plugin(indigo.PluginBase):
             for k, v in self.lights.iteritems():
                 indigo.device.turnOff(k)
 
-        # Keep/turn on specific lights, turn off all others
+        # If dark, Keep/turn on specific lights, turn off all others
         elif pluginAction.props.get('stop_action', '') == 'stop_and_keep_specific_on':
 
-            keepOn = []
+            daylight = indigo.variables['isDaylight'].value
+            if daylight == 'false':
 
-            for d in pluginAction.props.get('indigo_dimmable', ''):
-                indigo.device.turnOn(int(d))
-                keepOn.append(int(d))
+                keepOn = []
 
-            for r in pluginAction.props.get('indigo_relay', ''):
-                indigo.device.turnOn(int(r))
-                keepOn.append(int(r))
+                for d in pluginAction.props.get('indigo_dimmable', ''):
+                    indigo.device.turnOn(int(d))
+                    keepOn.append(int(d))
 
-            for k, v in self.lights.iteritems():
-                if k not in keepOn:
-                    indigo.device.turnOff(k)
+                for r in pluginAction.props.get('indigo_relay', ''):
+                    indigo.device.turnOn(int(r))
+                    keepOn.append(int(r))
+
+                for k, v in self.lights.iteritems():
+                    if k not in keepOn:
+                        indigo.device.turnOff(k)
 
 #==============================================================================================#
 # Light Class
