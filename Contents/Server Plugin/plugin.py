@@ -17,6 +17,7 @@ class Plugin(indigo.PluginBase):
 
         self.threads = {}
         self.q = Queue.Queue()
+        self.device_created = False
 
     def __del__(self):
         for k, v in self.threads.iteritems():
@@ -37,6 +38,7 @@ class Plugin(indigo.PluginBase):
 
         self.lights = {}
         self.p_device = device
+        self.device_created = True
 
         for d in device.pluginProps.get('indigo_dimmable', ''):
             dimmer = indigo.devices[int(d)]
@@ -58,36 +60,41 @@ class Plugin(indigo.PluginBase):
             while True:
 
                 #============================================================================================#
-                # Check if random lights should be running at startup
+                # Check if user has created a virtual device
                 #============================================================================================#
-                quiet_set = self.p_device.pluginProps.get('quiet_checkbox', '')
-                daylight = indigo.variables['isDaylight'].value
-
-
-                #============================================================================================#
-                # Check for daylight
-                #============================================================================================#
-                if daylight == 'true':
-                    self.enabled = False
-
-                elif daylight == 'false':
-                    self.enabled = True
+                if self.device_created:
 
                     #========================================================================================#
-                    # If Quiet Period is set, check if we are within those bounds and enable/disable
+                    # Check if random lights should be running at startup
                     #========================================================================================#
-                    if quiet_set:
-                        quiet_start = int(self.p_device.pluginProps.get('quiet_start', ''))
-                        quiet_end = int(self.p_device.pluginProps.get('quiet_end', ''))
-                        quiet_range = [17, 18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8]
-                        quiet_period = quiet_range[quiet_range.index(quiet_start):quiet_range.index(quiet_end)]
-                        hour = int(datetime.now().time().hour)
+                    quiet_set = self.p_device.pluginProps.get('quiet_checkbox', '')
+                    daylight = indigo.variables['isDaylight'].value
 
-                        if hour in quiet_period:
-                            self.enabled = False
 
-                        else:
-                            self.enabled = True
+                    #========================================================================================#
+                    # Check for daylight
+                    #========================================================================================#
+                    if daylight == 'true':
+                        self.enabled = False
+
+                    elif daylight == 'false':
+                        self.enabled = True
+
+                        #====================================================================================#
+                        # If Quiet Period is set, check if we are within those bounds and enable/disable
+                        #====================================================================================#
+                        if quiet_set:
+                            quiet_start = int(self.p_device.pluginProps.get('quiet_start', ''))
+                            quiet_end = int(self.p_device.pluginProps.get('quiet_end', ''))
+                            quiet_range = [17, 18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8]
+                            quiet_period = quiet_range[quiet_range.index(quiet_start):quiet_range.index(quiet_end)]
+                            hour = int(datetime.now().time().hour)
+
+                            if hour in quiet_period:
+                                self.enabled = False
+
+                            else:
+                                self.enabled = True
 
                 self.sleep(60)
 
